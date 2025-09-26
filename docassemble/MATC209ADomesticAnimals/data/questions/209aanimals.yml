@@ -1,0 +1,498 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+---
+metadata:
+  title: >-
+    209A domesticated animals
+  short title: >-
+    209A domesticated animals
+  description: |-
+    This interview helps someone in Massachusetts ask the court for a 209A relative to a domesticated animal(s).
+  can_I_use_this_form: |
+    If you are a _______petitioner______, you can use this interview to __petition for a 209A relative to domesticated animals__________.
+  before_you_start: |
+    This interview will help you ask the court for a 209A relative to a domesticated animal(s).
+    
+    Before you get started, please gather:
+    
+    1. respondent's name
+    1. kind of animal(s)
+    1. name of animal(s)
+    
+    When you are finished, you will need to:
+    
+    1. 
+    1.
+  maturity: production
+  estimated_completion_minutes: 10
+  estimated_completion_delta: 5
+  LIST_topics: 
+    - "GO-00-00-00-00"
+  tags:
+    - "GO-00-00-00-00"
+  authors:
+  original_form: []
+  original_form_published_on: ""
+  allowed_courts: 
+    - "Boston Municipal Court"
+    - "District Court"
+  typical_role: "plaintiff"
+  al_weaver_version: "1.11.0"
+  generated_on: "2025-09-24"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+MA
+  review_date: 2025-09-24
+  form_titles:
+    - 209A domesticated animals
+  form_numbers: []
+  update_notes: |
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-ADomesticatedAnimals'
+---
+code: |
+  interview_short_title = "Ask the court for a 209A relative to a domesticated animal(s)"
+---
+code: |
+  al_form_type = "starts_case" 
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=1)
+---
+sections:
+  - review_a_domesticated_animals: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_a_domesticated_animals
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = ['Boston Municipal Court', 'District Court']
+  nav.set_section("review_a_domesticated_animals")
+  user_role = "plaintiff"
+  user_ask_role = "plaintiff"
+  A_Petition_for_Domesticated_Animals
+  juvenile_court
+  plaintiffs1__name_full_1
+  set_progress(14)
+  defendants1_name_full_1
+  tro_requested
+  domesticated_animals
+  set_progress(28)
+  defendant_refrain
+  domesticated_animals_names_1
+  supporting_statement
+  set_progress(42)
+  domesticated_animals_names
+  docket_number
+  trial_court.division
+  set_progress(56)
+  plaintiffs.gather()
+  defendants.gather()
+  signature_date
+  set_progress(70)
+  interview_order_a_domesticated_animals = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  a_domesticated_animals_intro
+  interview_order_a_domesticated_animals
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  a_domesticated_animals_download
+---
+id: A_domesticated_animals
+continue button field: a_domesticated_animals_intro
+question: |
+  209A domesticated animals
+subquestion: |
+  This interview will help you ask the court for a 209A relative to a domesticated animal(s).
+  
+  Before you get started, please gather:
+  
+  1. respondent's name
+  1. kind of animal(s)
+  1. name of animal(s)
+  
+  When you are finished, you will need to:
+  
+  1. 
+  1.
+
+  If you are a _______petitioner______, you can use this interview to __petition for a 209A relative to domesticated animals__________.
+
+  Most people take about 10 minutes to complete this interview.
+---
+id: 209A Petition for Domesticated Animal s
+question: |
+  209A Petition for Domesticated Animal(s)
+continue button field: A_Petition_for_Domesticated_Animals
+---
+id: Select Trial Court Division
+question: |
+  Select Trial Court Division
+fields:
+  - "Juvenile court": juvenile_court
+    datatype: yesno
+  - "Probate family court": probate_family_court
+    datatype: yesno
+  - "Superior court": superior_court
+    datatype: yesno
+  - "Boston municipal court": boston_municipal_court
+    datatype: yesno
+  - "District court": district_court
+    datatype: yesno
+---
+id: Petitioner s Name
+question: |
+  Petitioner's Name
+fields:
+  - "Plaintiffs1  name full 1": plaintiffs1__name_full_1
+    maxlength: 17
+---
+id: Respondent s Name
+question: |
+  Respondent's Name
+fields:
+  - "Defendants1 name full 1": defendants1_name_full_1
+    maxlength: 17
+---
+id: Prior 209A
+question: |
+  Prior 209A
+subquestion: |
+  Please check this box if a 209A has been issued or requested on this matter prior to this petition.
+fields:
+  - "Tro requested": tro_requested
+    datatype: yesno
+---
+id: Domesticated Animal s
+question: |
+  Domesticated Animal(s)
+subquestion: |
+  List the domesticated animal(s) for this petition
+fields:
+  - "Domesticated animals": domesticated_animals
+    input type: area
+    maxlength: 270
+---
+id: Respondent Refrain
+question: |
+  Respondent Refrain
+subquestion: |
+  Please check this box if you are asking the court to issue an order for the Respondent to refrain from abusing domesticated animal(s) covered by this petition
+fields:
+  - "Defendant refrain": defendant_refrain
+    datatype: yesno
+---
+id: Petitioner Seeks Possession
+question: |
+  Petitioner Seeks Possession
+subquestion: |
+  Please check this box if you want possession of domesticated animal(s) covered by this petition
+fields:
+  - "Domesticated animals names 1": domesticated_animals_names_1
+    maxlength: 85
+---
+id: Supporting Statement
+question: |
+  Supporting Statement
+subquestion: |
+  Please write a statement in support of your petition
+fields:
+  - "Supporting statement": supporting_statement
+    input type: area
+    maxlength: 273
+---
+id: Date
+question: |
+  Date
+fields:
+  - "Domesticated animals names": domesticated_animals_names
+    maxlength: 84
+  - "Plaintiffs1 name full 2": plaintiffs1_name_full_2
+    maxlength: 17
+  - "Plaintiff possession": plaintiff_possession
+    datatype: yesno
+  - "Plaintiff mail": plaintiff_mail
+    datatype: yesno
+  - "Trial court division 1": trial_court_division_1
+    maxlength: 22
+  - "Date of hearing": hearing_date
+    datatype: date
+  - "Trial court city": trial_court_city
+    maxlength: 27
+  - "Hearing time": hearing_time
+    maxlength: 16
+---
+id: preview a_domesticated_animals
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_a_domesticated_animals'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: a_domesticated_animals_preview_question    
+---
+code: |
+  signature_fields = ['plaintiffs[0].signature']
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: a domesticated animals review screen
+event: review_a_domesticated_animals
+question: |
+  Review your answers
+review:
+  - Edit: juvenile_court
+    button: |
+      **Juvenile court**:
+      ${ word(yesno(juvenile_court)) }
+  - Edit: probate_family_court
+    button: |
+      **Probate family court**:
+      ${ word(yesno(probate_family_court)) }
+  - Edit: superior_court
+    button: |
+      **Superior court**:
+      ${ word(yesno(superior_court)) }
+  - Edit: boston_municipal_court
+    button: |
+      **Boston municipal court**:
+      ${ word(yesno(boston_municipal_court)) }
+  - Edit: district_court
+    button: |
+      **District court**:
+      ${ word(yesno(district_court)) }
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: trial_court
+    button: |
+      **Trial court**
+  
+      % if defined("trial_court.division"):
+      * division: ${ trial_court.division }
+      % endif
+  - Edit: plaintiffs.revisit
+    button: |
+      **Plaintiffs**
+
+      % for item in plaintiffs:
+        * ${ item }
+      % endfor
+  - Edit: defendants.revisit
+    button: |
+      **Defendants**
+
+      % for item in defendants:
+        * ${ item }
+      % endfor
+  - Edit: plaintiffs1__name_full_1
+    button: |
+      **Plaintiffs1  name full 1**:
+      ${ plaintiffs1__name_full_1 }
+  - Edit: tro_requested
+    button: |
+      **Tro requested**:
+      ${ word(yesno(tro_requested)) }
+  - Edit: domesticated_animals
+    button: |
+      **Domesticated animals**:
+      > ${ single_paragraph(domesticated_animals) }
+  - Edit: defendants1_name_full_1
+    button: |
+      **Defendants1 name full 1**:
+      ${ defendants1_name_full_1 }
+  - Edit: defendant_refrain
+    button: |
+      **Defendant refrain**:
+      ${ word(yesno(defendant_refrain)) }
+  - Edit: domesticated_animals_names
+    button: |
+      **Domesticated animals names**:
+      ${ domesticated_animals_names }
+  - Edit: plaintiffs1_name_full_2
+    button: |
+      **Plaintiffs1 name full 2**:
+      ${ plaintiffs1_name_full_2 }
+  - Edit: plaintiff_possession
+    button: |
+      **Plaintiff possession**:
+      ${ word(yesno(plaintiff_possession)) }
+  - Edit: domesticated_animals_names_1
+    button: |
+      **Domesticated animals names 1**:
+      ${ domesticated_animals_names_1 }
+  - Edit: supporting_statement
+    button: |
+      **Supporting statement**:
+      > ${ single_paragraph(supporting_statement) }
+  - Edit: signature_date
+    button: |
+      **Date of signature**:
+      ${ signature_date }
+  - Edit: plaintiff_mail
+    button: |
+      **Plaintiff mail**:
+      ${ word(yesno(plaintiff_mail)) }
+  - Edit: trial_court_division_1
+    button: |
+      **Trial court division 1**:
+      ${ trial_court_division_1 }
+  - Edit: hearing_date
+    button: |
+      **Date of hearing**:
+      ${ hearing_date }
+  - Edit: trial_court_city
+    button: |
+      **Trial court city**:
+      ${ trial_court_city }
+  - Edit: hearing_time
+    button: |
+      **Hearing time**:
+      ${ hearing_time }
+---
+continue button field: plaintiffs.revisit
+question: |
+  Edit plaintiffs
+subquestion: |
+  ${ plaintiffs.table }
+
+  ${ plaintiffs.add_action() }
+---
+table: plaintiffs.table
+rows: plaintiffs
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Signature: |
+      row_item.signature if defined("row_item.signature") else ""
+edit:
+  - name.first
+  - signature
+confirm: True
+
+---
+continue button field: defendants.revisit
+question: |
+  Edit defendants
+subquestion: |
+  ${ defendants.table }
+
+  ${ defendants.add_action() }
+---
+table: defendants.table
+rows: defendants
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+id: download a_domesticated_animals
+event: a_domesticated_animals_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_a_domesticated_animals'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - a_domesticated_animals_attachment: ALDocument.using(title="209A domesticated animals", filename="a_domesticated_animals", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[a_domesticated_animals_attachment], filename="a_domesticated_animals", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[a_domesticated_animals_attachment],  filename="a_domesticated_animals", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+---
+attachment:
+  name: a domesticated animals
+  filename: a_domesticated_animals
+  variable name: a_domesticated_animals_attachment[i]
+  skip undefined: True
+  pdf template file: a_domesticated_animals.pdf
+  fields:
+      - "juvenile_court": ${ juvenile_court }
+      - "probate_family_court": ${ probate_family_court }
+      - "superior_court": ${ superior_court }
+      - "boston_municipal_court": ${ boston_municipal_court }
+      - "district_court": ${ district_court }
+      - "docket_number": ${ docket_number }
+      - "trial_court_division": ${ trial_court.division }
+      - "plaintiffs1_name_full": ${ plaintiffs[0] }
+      - "defendants1_name_full": ${ defendants[0] }
+      - "plaintiffs1__name_full_1": ${ plaintiffs1__name_full_1 }
+      - "tro_requested": ${ tro_requested }
+      - "domesticated_animals": ${ domesticated_animals }
+      - "defendants1_name_full_1": ${ defendants1_name_full_1 }
+      - "defendant_refrain": ${ defendant_refrain }
+      - "domesticated_animals_names": ${ domesticated_animals_names }
+      - "plaintiffs1_name_full_2": ${ plaintiffs1_name_full_2 }
+      - "plaintiff_possession": ${ plaintiff_possession }
+      - "domesticated_animals_names_1": ${ domesticated_animals_names_1 }
+      - "supporting_statement": ${ supporting_statement }
+      - "signature_date": ${ signature_date }
+      - "plaintiffs1_signature": ${ plaintiffs[0].signature }
+      - "plaintiff_mail": ${ plaintiff_mail }
+      - "trial_court_division_1": ${ trial_court_division_1 }
+      - "hearing_date": ${ hearing_date.format() }
+      - "trial_court_city": ${ trial_court_city }
+      - "hearing_time": ${ hearing_time }
+
+
+
