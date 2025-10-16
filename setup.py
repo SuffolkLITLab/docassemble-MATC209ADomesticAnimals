@@ -53,7 +53,7 @@ setup(name='docassemble.MATC209ADomesticAnimals',
       license='',
       url='https://docassemble.org',
       packages=find_namespace_packages(),
-      install_requires=[],
+      install_requires=['zope.interface>=8.0.1'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/MATC209ADomesticAnimals/', package='docassemble.MATC209ADomesticAnimals'),
      )

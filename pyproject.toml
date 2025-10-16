@@ -12,7 +12,9 @@ readme = "README.md"
 authors = [
     { name = "Suffolk LIT Clinic", email = "litlab@su.suffolk.edu" },
 ]
-dependencies = []
+dependencies = [
+    "zope.interface>=8.0.1",
+]
 
 [project.urls]
 Homepage = "https://docassemble.org"
