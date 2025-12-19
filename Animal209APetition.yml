@@ -1,0 +1,1071 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+---
+metadata:
+  title: >-
+    Animal Protection Form (209A)
+  short title: >-
+    Animal Protection
+  description: |-
+    This form helps you ask the court to protect animals. You can get a court order to keep animals safe. You need to have a case already filed to continue. 
+  can_I_use_this_form: |
+    You can use this form if:
+    • You have a court case already (divorce, abuse, or harassment)
+    • You want to keep animals safe from harm
+    • You want the court to give you the animals
+  before_you_start: |
+    This form helps you protect animals.
+    
+    **What you need:**
+    
+    • Names of the animals
+    • Name of the person hurting them
+    • Why the animals need help
+    
+    **What you will do:**
+    
+    • Sign the form
+    • Give it to the court
+    • Tell the other person
+  maturity: production
+  estimated_completion_minutes: 10
+  estimated_completion_delta: 5
+  LIST_topics: 
+    - "GO-00-00-00-00"
+  tags:
+    - "GO-00-00-00-00"
+  authors:
+    - MassAccess
+  original_form: []
+  original_form_published_on: ""
+  allowed_courts: 
+    - "Boston Municipal Court"
+    - "District Court"
+    - "Housing Court"
+    - "Juvenile Court"
+    - "Probate and Family Court"
+    - "Superior Court"
+  typical_role: "na"
+  al_weaver_version: "1.11.0"
+  generated_on: "2025-10-07"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+MA
+  review_date: 2025-10-07
+  form_titles:
+    - Animals 209A
+  form_numbers: []
+  update_notes: |
+---
+code: |
+  interview_metadata["animals_209a"] = {
+    "al_weaver_version": "1.11.0",
+    "generated_on": "2025-10-14",
+    "title": "Protect the Animals",
+    "short_title": "Animal Protection",
+    "description": "This form helps you ask the court to protect animals",
+    "original_form": [],
+    "allowed_courts": [
+      "Boston Municipal Court",
+      "District Court",
+      "Housing Court",
+      "Juvenile Court",
+      "Probate and Family Court",
+      "Superior Court",
+    ],
+    "categories": [],
+    "typical_role": "plaintiff",
+    "logic_block_variable": "interview_order_animals_209a",
+    "attachment_block_variable": "animals_209a_attachment",
+    "fields": [],
+  }
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-Animals209A'
+---
+code: |
+  interview_short_title = "File a 209A Petition for Domesticated Animals"
+---
+code: |
+  al_form_type = "existing_case"
+---
+code: |
+  # Set MassAccess branding
+  if not defined('al_organization_name'):
+    al_organization_name = "MassAccess"
+  if not defined('al_organization_website'):
+    al_organization_website = "https://massaccess.org"
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=1)
+  - plaintiffs: ALPeopleList.using(ask_number=True,target_number=1)
+  - defendants: ALPeopleList.using(ask_number=True,target_number=1)
+  - petitioners: ALPeopleList.using(ask_number=True,target_number=1)
+  - respondents: ALPeopleList.using(ask_number=True,target_number=1)
+  - trial_court: ALCourt
+  - courts: ALCourtLoader.using(file_name='docassemble.MACourts:courts.xlsx')
+---
+sections:
+  - review_animals_209a: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_animals_209a
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = ['Boston Municipal Court', 'District Court', 'Housing Court', 'Juvenile Court', 'Probate and Family Court', 'Superior Court']
+  nav.set_section("review_animals_209a")
+  user_role = "na"
+  user_ask_role = "na"
+  
+  # Step 1: Get user's name first
+  users.gather()
+  set_progress(10)
+  
+  # Step 2: Ask which role they have in the case
+  petitioner_is_plaintiff
+  petitioner_is_defendant
+  
+  # Step 3: Gather the other party's name
+  if petitioner_is_plaintiff:
+    defendants.gather()
+  else:
+    plaintiffs.gather()
+  
+  # Link parties based on user's role
+  petitioner_respondent_determined
+  set_progress(20)
+  
+  # Step 4: Court and case details
+  trial_court
+  docket_number
+  order_requested
+  set_progress(30)
+  
+  # Step 5: List animals
+  domesticated_animals
+  set_progress(40)
+  
+  # Step 6: Abuse question
+  respondents1_refrain
+  if respondents1_refrain:
+    domesticated_animals1
+  
+  # Step 7: Possession question
+  petitioners1_possess
+  if petitioners1_possess:
+    domesticated_animals2
+  
+  # Check if at least one type of relief is requested
+  if not (respondents1_refrain or petitioners1_possess):
+    no_relief_requested_exit
+  set_progress(55)
+  
+  # Step 8: Supporting statement (why help is needed)
+  supporting_statement
+  set_progress(60)
+  
+  # Step 9: Collect petitioner contact information (combined - address, phone, email)
+  users[0].address.address
+  users[0].phone_number
+  set_progress(70)
+  
+  # Step 10: Mailing notice
+  petitioners1_mail
+  court_mail
+  mail_not_sure
+  
+  # Validate that at least one mailing option is selected
+  if not (petitioners1_mail or court_mail or mail_not_sure):
+    validation_error("You must select who will mail notice of the hearing.")
+  
+  # If petitioner is mailing, collect hearing information
+  if petitioners1_mail:
+    hearing_court_name
+    hearing_court_address
+    hearing_date
+    hearing_time
+  set_progress(85)
+  
+  # Final steps
+  signature_date
+  interview_order_animals_209a = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  animals_209a_welcome
+  # Check for existing case FIRST - exit early if they don't have one
+  existing_case
+  existing_case_check
+  interview_order_animals_209a
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  # Background assembly: check if preview is ready
+  if not al_user_bundle.generate_preview_task.ready():
+    al_preview_waiting_screen
+  basic_questions_signature_flow
+  # Background assembly: check if downloads are ready
+  if not al_user_bundle.generate_downloads_with_docx_task.ready():
+    al_download_waiting_screen
+  animals_209a_download
+---
+id: animals_209a_welcome
+question: |
+  Animal Protection Petition
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">What is this petition?</p>
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">This is a legal form to protect animals from abuse or harm. It asks the court to make orders about animals in your existing case (like a divorce, restraining order, or harassment case).</p>
+  
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">Who can use this form?</p>
+  <p style="margin: 0 0 5px 0; color: #333; font-size: 15px;">You can use this form if:</p>
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">• You already have a case in court (divorce, abuse prevention, or harassment)<br>
+  • There are animals involved that need protection<br>
+  • You want the court to order the other person to stay away from the animals OR give the animals to you</p>
+  
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">What can this form do?</p>
+  <p style="margin: 0 0 5px 0; color: #333; font-size: 15px;">The court can order the other person to:</p>
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">• Stop hurting, threatening, taking, hiding, or selling the animals<br>
+  • Give the animals to you to keep them safe</p>
+  
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">Important:</p>
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">You must already have an open court case to use this form. This cannot be filed on its own.</p>
+  
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">What you need:</p>
+  <p style="margin: 0; color: #333; font-size: 15px;">• Docket number of your existing case<br>
+  • Names of the animals<br>
+  • Name of the person hurting them<br>
+  • Why the animals need help</p>
+  </div>
+  
+  **Time:** About 10 minutes.
+continue button field: animals_209a_welcome
+button: Get Started
+---
+id: existing_case_check
+question: |
+  Do you have a case in court now?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">Do you have a case in court now?</p>
+  <p style="margin: 0; color: #333; font-size: 15px;">To use this form, you must either:</p>
+  <p style="margin: 5px 0 0 0; color: #333; font-size: 15px;">• Have a case already filed in court, OR<br>
+  • Be filing this at the same time as your main case (like a restraining order or divorce)</p>
+  </div>
+yesno: existing_case
+---
+event: no_existing_case_exit
+question: |
+  You need a court case first
+subquestion: |
+  You can only use this form if you already have a court case.
+  
+  **You need to file a case first.** This could be:
+  
+  <ul class="ma-bullet-list">
+  <li>Divorce</li>
+  <li>Abuse</li>
+  <li>Harassment</li>
+  </ul>
+  
+  **Get help:**
+  
+  <ul class="ma-bullet-list">
+  <li>Call your local court</li>
+  <li>Talk to a lawyer</li>
+  <li>Visit <a href="https://www.masslegalhelp.org">MassLegalHelp.org</a></li>
+  </ul>
+  
+  <div class="ma-callout">
+  <p class="ma-callout-title">Call the Trial Court Help Line:</p>
+  <p class="ma-callout-text">833-91-COURT (833-912-6878)<br>
+  Monday - Friday, 8:30am - 4:30pm</p>
+  </div>
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+code: |
+  if not existing_case:
+    no_existing_case_exit
+  existing_case_check = True
+---
+event: no_relief_requested_exit
+question: |
+  You need to ask the court for help
+subquestion: |
+  To use this form, you need to ask the court for at least one thing:
+  
+  • Stop the other person from hurting the animals, OR
+  • Give you the animals, OR
+  • Both
+  
+  If you don't need the court to do either of these things, you don't need this form.
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: docket number
+question: |
+  What is your case number?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="font-size: 18px; margin: 0 0 10px 0; color: #14558F; font-weight: 600;">How do I find my docket number?</p>
+  
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">First, go to <a href="https://masscourts.org" target="_blank" style="color: #14558F;">masscourts.org</a> and select "Click here to search public records"</p>
+  
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">Then, choose the court department, division, and location your case was filed in.</p>
+  
+  <p style="margin: 0 0 15px 0; color: #333; font-size: 15px;">After that, you can search by case type, case number or ticket number. For civil cases, you can also search by name.</p>
+  
+  <p style="margin: 0; color: #333; font-size: 15px;">Learn more about finding docket numbers on <a href="https://www.mass.gov/search-court-dockets-calendars-and-case-information" target="_blank" style="color: #14558F;">mass.gov</a>.</p>
+  </div>
+  
+  <p style="margin: 15px 0 5px 0; color: #333; font-size: 15px;">Your case number might look like:</p>
+  <ul style="margin: 5px 0 15px 0; padding-left: 20px; color: #333; font-size: 15px;">
+    <li>24-CV-001026</li>
+    <li>ES15A0064AD</li>
+  </ul>
+fields:
+  - "Case number": docket_number
+    required: True
+    help: |
+      Your case number helps the court find your case.
+---
+id: trial court question
+question: |
+  Which court has your case?
+subquestion: |
+  Look at your court paperwork. **Start typing** the court name to search the list, then select it.
+  
+  For example, type "Suffolk" to find Suffolk Probate and Family Court.
+fields:
+  - no label: trial_court
+    datatype: object
+    choices: all_courts
+    object labeler: court_short_label
+    disable others: True
+---
+id: Has a prior order been requested
+question: |
+  Has a judge already made any orders in your case?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0 0 10px 0; color: #333; font-size: 15px;">This can include:</p>
+  <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #333; font-size: 15px;">
+    <li>Restraining or abuse-prevention orders</li>
+    <li>No-contact or stay-away orders</li>
+    <li>Orders about custody or where someone must live</li>
+  </ul>
+  </div>
+  <p style="margin: 15px 0 10px 0; color: #333; font-size: 15px; font-weight: 500;">Choose one:</p>
+  <style>
+    .da-field-order_requested .btn-group {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 10px !important;
+      width: 100% !important;
+    }
+    .da-field-order_requested .btn,
+    .da-field-order_requested button {
+      flex: 1 1 auto !important;
+      background-color: #14558F !important;
+      color: white !important;
+      border-color: #14558F !important;
+      padding: 10px 20px !important;
+      border-radius: 4px !important;
+      font-weight: 500 !important;
+    }
+    .da-field-order_requested .btn:hover,
+    .da-field-order_requested button:hover {
+      background-color: #0d3d6b !important;
+      border-color: #0d3d6b !important;
+    }
+    .da-field-order_requested .btn.active,
+    .da-field-order_requested button.active {
+      background-color: #0d3d6b !important;
+      border-color: #0d3d6b !important;
+    }
+  </style>
+field: order_requested
+button style: horizontal
+buttons:
+  - "Yes": True
+  - "No": False
+---
+id: what animals are you petitioning for
+question: |
+  Animals included in this request
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0 0 10px 0; color: #333; font-size: 15px;">Please list the animals you want the court order to cover.</p>
+  <p style="margin: 0 0 10px 0; color: #333; font-size: 15px;">For each animal, write the name (if there is one) and a short description so the animal is easy to identify.</p>
+  <p style="margin: 0 0 10px 0; color: #333; font-size: 15px;">You can list an animal even if the other person says it is theirs.</p>
+  <p style="margin: 10px 0 0 0; color: #333; font-size: 15px;"><strong>Example:</strong></p>
+  <p style="margin: 5px 0 0 0; color: #333; font-size: 15px;">Dog named Max, brown and white, medium size</p>
+  <p style="margin: 5px 0 0 0; color: #333; font-size: 15px;">Gray tabby cat named Luna</p>
+  </div>
+  
+  Write your list below:
+fields:
+  - "The animals": domesticated_animals
+    input type: area
+    maxlength: 273
+---
+id: do you want the respondent to refrain abuse
+question: |
+  Should the other person stay away from the animals?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0 0 10px 0; color: #333; font-size: 15px;">I want the court to order the other person to stop (one or more of these can apply):</p>
+  <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #333; font-size: 15px;">
+    <li>Hurting them</li>
+    <li>Threatening them</li>
+    <li>Taking them</li>
+    <li>Hiding them</li>
+    <li>Selling them</li>
+  </ul>
+  </div>
+field: respondents1_refrain
+button style: horizontal
+buttons:
+  - Yes, I want them to stop: True
+  - No, this is not needed: False
+---
+id: refrain abuse of which animals
+question: |
+  Which animal(s) should the other person stay away from?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0; color: #333; font-size: 15px;">List which animals the other person must stay away from.</p>
+  <p style="margin: 10px 0 0 0; color: #333; font-size: 15px;">You don't have to include every animal you listed earlier.</p>
+  </div>
+  
+  <style>
+    .da-field-domesticated_animals1 textarea {
+      border-color: #14558F !important;
+    }
+    .da-field-domesticated_animals1 textarea:focus {
+      border-color: #14558F !important;
+      box-shadow: 0 0 0 2px rgba(20, 85, 143, 0.2) !important;
+    }
+    .da-field-domesticated_animals1 label {
+      color: #14558F !important;
+      font-weight: 500 !important;
+    }
+  </style>
+fields:
+  - "Which animal(s)": domesticated_animals1
+    input type: area
+    maxlength: 273
+    required: True
+    help: |
+      Example: "Buddy and Fluffy"
+validation code: |
+  if respondents1_refrain and not domesticated_animals1:
+    validation_error("You must specify which animals the other person should stay away from.")
+---
+comment: |
+  User's name collected first, then we determine their role, then collect other party's name
+---
+id: petitioner_is_party
+question: |
+  Are you the plaintiff or defendant in your case?
+subquestion: |
+  ${ users[0] }, in your existing court case:
+  
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <ul style="margin: 0; padding-left: 20px; color: #333; font-size: 15px;">
+    <li>The <strong>plaintiff</strong> is the person who started the case</li>
+    <li>The <strong>defendant</strong> is the person who responded to the case</li>
+  </ul>
+  </div>
+  
+  <style>
+    .da-field-petitioner_is_plaintiff,
+    .da-field-petitioner_is_defendant {
+      display: inline-block !important;
+      width: 48% !important;
+      margin: 0 1% !important;
+      vertical-align: top !important;
+    }
+    .da-field-petitioner_is_plaintiff label,
+    .da-field-petitioner_is_defendant label {
+      display: block !important;
+      width: 100% !important;
+      background-color: #14558F !important;
+      color: white !important;
+      border: 2px solid #14558F !important;
+      padding: 12px 20px !important;
+      border-radius: 4px !important;
+      font-weight: 500 !important;
+      text-align: center !important;
+      cursor: pointer !important;
+      margin: 0 !important;
+    }
+    .da-field-petitioner_is_plaintiff label:hover,
+    .da-field-petitioner_is_defendant label:hover {
+      background-color: #0d3d6b !important;
+      border-color: #0d3d6b !important;
+    }
+    .da-field-petitioner_is_plaintiff input[type="checkbox"]:checked + label,
+    .da-field-petitioner_is_defendant input[type="checkbox"]:checked + label {
+      background-color: #0d3d6b !important;
+      border-color: #0d3d6b !important;
+    }
+    .da-field-petitioner_is_plaintiff input[type="checkbox"],
+    .da-field-petitioner_is_defendant input[type="checkbox"] {
+      display: none !important;
+    }
+  </style>
+fields:
+  - "I am the Plaintiff": petitioner_is_plaintiff
+    datatype: yesno
+  - "I am the Defendant": petitioner_is_defendant
+    datatype: yesno
+---
+code: |
+  # Validate that exactly one party role is selected
+  if not (petitioner_is_plaintiff or petitioner_is_defendant):
+    validation_error("You must select whether you are the plaintiff or defendant in your existing case.")
+  if petitioner_is_plaintiff and petitioner_is_defendant:
+    validation_error("You cannot be both the plaintiff and defendant. Please select only one.")
+  
+  # Auto-populate petitioner, plaintiff, defendant, and respondent based on who is filing
+  if petitioner_is_plaintiff:
+    # User is the plaintiff
+    plaintiffs.clear()
+    plaintiffs.append(users[0])
+    plaintiffs.gathered = True
+    plaintiffs.there_is_another = False
+    # User (plaintiff) is also the petitioner
+    petitioners.clear()
+    petitioners.append(users[0])
+    petitioners.gathered = True
+    petitioners.there_is_another = False
+    # Defendants was already gathered - now link to respondent
+    respondents.clear()
+    respondents.append(defendants[0])
+    respondents.gathered = True
+    respondents.there_is_another = False
+  elif petitioner_is_defendant:
+    # User is the defendant
+    defendants.clear()
+    defendants.append(users[0])
+    defendants.gathered = True
+    defendants.there_is_another = False
+    # User (defendant) is also the petitioner
+    petitioners.clear()
+    petitioners.append(users[0])
+    petitioners.gathered = True
+    petitioners.there_is_another = False
+    # Plaintiffs was already gathered - now link to respondent
+    respondents.clear()
+    respondents.append(plaintiffs[0])
+    respondents.gathered = True
+    respondents.there_is_another = False
+  
+  # Mark that we've determined the petitioner/respondent
+  petitioner_respondent_determined = True
+---
+comment: |
+  Petitioner and respondent are linked to users[0] and the other party based on role selection
+---
+id: petitioner contact information
+question: |
+  What is your contact information?
+subquestion: |
+  The court needs your contact information to send you notices about your case and to reach you if needed.
+  
+  Include at least **one way** to reach you other than by mail (phone or email).
+fields:
+  - code: |
+      users[0].address_fields(country_code=AL_DEFAULT_COUNTRY, default_state=AL_DEFAULT_STATE)
+  - Phone number: users[0].phone_number
+    required: False
+  - Email: users[0].email
+    datatype: email
+    required: False
+validation code: |
+  if not (users[0].phone_number or users[0].email):
+    validation_error("You must provide at least a phone number or email address.", field="users[0].phone_number")
+---
+id: do you want possession
+question: |
+  Do you want the judge to say the animal(s) should stay with you?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0 0 10px 0; color: #333; font-size: 15px;">This means:</p>
+  <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #333; font-size: 15px;">
+    <li>The animal(s) would live with you, and</li>
+    <li>The other person would not be allowed to take them or bother them.</li>
+  </ul>
+  </div>
+  <p style="margin: 15px 0 10px 0; color: #333; font-size: 15px; font-weight: 500;">Choose one:</p>
+  
+  <style>
+    .da-field-petitioners1_possess .btn-group,
+    .da-field-petitioners1_possess .da-button-group {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 10px !important;
+      width: 100% !important;
+    }
+    .da-field-petitioners1_possess .btn-group button,
+    .da-field-petitioners1_possess .da-button-group button,
+    .da-field-petitioners1_possess button {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      white-space: normal !important;
+      background-color: #14558F !important;
+      color: white !important;
+      border-color: #14558F !important;
+      padding: 10px 15px !important;
+      border-radius: 4px !important;
+      font-weight: 500 !important;
+    }
+    .da-field-petitioners1_possess .btn-group button:hover,
+    .da-field-petitioners1_possess .da-button-group button:hover,
+    .da-field-petitioners1_possess button:hover {
+      background-color: #0d3d6b !important;
+      border-color: #0d3d6b !important;
+    }
+    .da-field-petitioners1_possess .btn-group button.active,
+    .da-field-petitioners1_possess .da-button-group button.active,
+    .da-field-petitioners1_possess button.active {
+      background-color: #0d3d6b !important;
+      border-color: #0d3d6b !important;
+    }
+  </style>
+field: petitioners1_possess
+button style: horizontal
+buttons:
+  - Yes: True
+  - No: False
+---
+id: possession of which animals
+question: |
+  Which animal(s) should stay with you?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0; color: #333; font-size: 15px;">List which animals should stay with you.</p>
+  <p style="margin: 10px 0 0 0; color: #333; font-size: 15px;">You don't have to include every animal you listed earlier.</p>
+  </div>
+  
+  <style>
+    .da-field-domesticated_animals2 textarea {
+      border-color: #14558F !important;
+    }
+    .da-field-domesticated_animals2 textarea:focus {
+      border-color: #14558F !important;
+      box-shadow: 0 0 0 2px rgba(20, 85, 143, 0.2) !important;
+    }
+    .da-field-domesticated_animals2 label {
+      color: #14558F !important;
+      font-weight: 500 !important;
+    }
+  </style>
+fields:
+  - "Which animal(s)": domesticated_animals2
+    input type: area
+    maxlength: 273
+    required: True
+    help: |
+      Example: "Buddy and Fluffy"
+validation code: |
+  if petitioners1_possess and not domesticated_animals2:
+    validation_error("You must specify which animals should stay with you.")
+---
+id: supporting statement
+question: |
+  Why are you asking the court for help?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0; color: #333; font-size: 15px;">Tell the court what is happening to the animals.</p>
+  </div>
+  
+  <style>
+    .da-field-supporting_statement textarea {
+      border-color: #14558F !important;
+    }
+    .da-field-supporting_statement textarea:focus {
+      border-color: #14558F !important;
+      box-shadow: 0 0 0 2px rgba(20, 85, 143, 0.2) !important;
+    }
+    .da-field-supporting_statement label {
+      color: #14558F !important;
+      font-weight: 500 !important;
+    }
+  </style>
+fields:
+  - "What is happening": supporting_statement
+    input type: area
+    maxlength: 273
+    required: True
+---
+id: who is mailing notice
+question: |
+  Who will notify the other person about the hearing?
+subquestion: |
+  The law says the other person must be told about this petition and the court hearing.
+  
+  Who will send them notice?
+fields:
+  - "I will send notice to the other person": petitioners1_mail
+    datatype: yesno
+  - "The court will send notice to both of us": court_mail
+    datatype: yesno
+  - "I'm not sure": mail_not_sure
+    datatype: yesno
+---
+id: hearing information
+question: |
+  When and where will the hearing happen?
+subquestion: |
+  <div style="background-color: #EBF5FB; border-left: 5px solid #14558F; padding: 20px; margin: 20px 0; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+  <p style="margin: 0; color: #333; font-size: 15px;">Since you are mailing notice to the other person, please provide the hearing information.</p>
+  </div>
+fields:
+  - "Court name (city/town)": hearing_court_name
+    required: False
+  - "Court address": hearing_court_address
+    required: False
+  - "Hearing date": hearing_date
+    datatype: date
+    required: False
+  - "Hearing time": hearing_time
+    required: False
+---
+comment: |
+  Court selection is handled automatically by AssemblyLine's trial_court object
+---
+id: animals_209a_preview_question
+question: |
+  Ready to sign your petition?
+subquestion: |
+  Review the preview above and click continue when you're ready to sign your petition.
+---
+id: signature_date
+question: |
+  What is today's date?
+subquestion: |
+  We filled in today's date for you. You can change it if needed.
+fields:
+  - "Date": signature_date
+    datatype: date
+    default: ${today()}
+---
+code: |
+  signature_fields = ['users[0].signature']
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: animals 209a review screen
+event: review_animals_209a
+question: |
+  Review your answers
+review:
+  - Edit: trial_court
+    button: |
+      **Court**:
+      ${ trial_court }
+  - Edit: docket_number
+    button: |
+      **Docket Number**:
+      ${ docket_number if docket_number else "Not provided" }
+  - Edit: plaintiffs.revisit
+    button: |
+      **Plaintiff**:
+      ${ plaintiffs[0].name.full() }
+  - Edit: defendants.revisit
+    button: |
+      **Defendant**:
+      ${ defendants[0].name.full() }
+  - Edit: petitioners.revisit
+    button: |
+      **Petitioner (You)**:
+      ${ petitioners[0].name.full() }
+  - Edit: users[0].address.address
+    button: |
+      **Your address**:
+      ${ users[0].address.on_one_line() }
+  - Edit: users[0].phone_number
+    button: |
+      **Your phone number**:
+      ${ users[0].phone_number if showifdef('users[0].phone_number') else 'Not provided' }
+  - Edit: users[0].email
+    button: |
+      **Your email**:
+      ${ users[0].email if showifdef('users[0].email') else 'Not provided' }
+  - Edit: respondents.revisit
+    button: |
+      **Respondent**:
+      ${ respondents[0].name.full() }
+  - Edit: order_requested
+    button: |
+      **Order requested**:
+      ${ word(yesno(order_requested)) }
+  - Edit: domesticated_animals
+    button: |
+      **Domesticated Animals**:
+      > ${ single_paragraph(domesticated_animals) }
+  - Edit: respondents1_refrain
+    button: |
+      **Respondent Refrain**:
+      ${ word(yesno(respondents1_refrain)) }
+  - Edit: domesticated_animals1
+    button: |
+      **Animals for respondent to refrain from abusing**:
+      ${ domesticated_animals1 }
+    show if: respondents1_refrain
+  - Edit: petitioners1_possess
+    button: |
+      **Petitioner possess**:
+      ${ word(yesno(petitioners1_possess)) }
+  - Edit: domesticated_animals2
+    button: |
+      **Animals for petitioner to have possession of**:
+      ${ domesticated_animals2 }
+    show if: petitioners1_possess
+  - Edit: supporting_statement
+    button: |
+      **Supporting statement**:
+      > ${ single_paragraph(supporting_statement) }
+  - Edit: signature_date
+    button: |
+      **Date of signature**:
+      ${ signature_date }
+  - Edit: petitioners1_mail
+    button: |
+      **Petitioner will mail notice**:
+      ${ word(yesno(petitioners1_mail)) }
+  - Edit: court_mail
+    button: |
+      **Court will mail notice**:
+      ${ word(yesno(court_mail)) }
+  - Edit: mail_not_sure
+    button: |
+      **I'm not sure**:
+      ${ word(yesno(mail_not_sure)) }
+---
+continue button field: docket_number
+question: |
+  Edit docket number
+subquestion: |
+  ${ docket_number }
+
+
+
+---
+continue button field: plaintiffs.revisit
+question: |
+  Edit plaintiffs
+subquestion: |
+  ${ plaintiffs.table }
+
+
+
+  ${ plaintiffs.add_action() }
+---
+table: plaintiffs.table
+rows: plaintiffs
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+continue button field: defendants.revisit
+question: |
+  Edit defendants
+subquestion: |
+  ${ defendants.table }
+
+
+
+  ${ defendants.add_action() }
+---
+table: defendants.table
+rows: defendants
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+continue button field: petitioners.revisit
+question: |
+  Edit petitioners
+subquestion: |
+  ${ petitioners.table }
+
+
+
+  ${ petitioners.add_action() }
+---
+table: petitioners.table
+rows: petitioners
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Signature: |
+      row_item.signature if defined("row_item.signature") else ""
+edit:
+  - name.first
+  - signature
+confirm: True
+
+---
+continue button field: respondents.revisit
+question: |
+  Edit respondents
+subquestion: |
+  ${ respondents.table }
+
+
+
+  ${ respondents.add_action() }
+---
+table: respondents.table
+rows: respondents
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+id: download animals_209a
+event: animals_209a_download
+question: |
+  Your form is ready!
+subquestion: |
+  Thank you, ${users}. Your form is done.
+  
+  You can download it below. Click "Edit" if you need to fix anything.
+
+
+
+  ${ action_button_html(url_action('review_animals_209a'), label='Edit', color='info') }
+  
+  
+
+  ${ al_user_bundle.download_list_html(use_previously_cached_files=True) }
+  
+
+
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - animals_209a_Post_interview_instructions: ALDocument.using(title="Instructions", filename="animals_209a_next_steps.docx", enabled=True, has_addendum=False)
+  - animals_209a_attachment: ALDocument.using(title="Animals 209A", filename="animals_209a", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[animals_209a_Post_interview_instructions, animals_209a_attachment], filename="animals_209a", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[animals_209a_attachment],  filename="animals_209a", title="All forms to deliver to court", enabled=True, default_parity="even")
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: animals_209a_next_steps
+  docx template file: a_petition_for_domesticated_anim_next_steps.docx
+  variable name: animals_209a_Post_interview_instructions[i]
+  skip undefined: True
+  tagged pdf: True
+---
+attachment:
+  name: animals 209a
+  filename: animals_209a
+  variable name: animals_209a_attachment[i]
+  skip undefined: True
+  pdf template file: a_petition_for_domesticated_anim.pdf
+  fields:
+      - "boston_municipal_court": ${ trial_court.department == "Boston Municipal Court" }
+      - "district_court": ${ trial_court.department == "District Court" }
+      - "juvenile_court": ${ trial_court.department == "Juvenile Court" }
+      - "probate_family_court": ${ trial_court.department == "Probate and Family Court" }
+      - "superior_court": ${ trial_court.department == "Superior Court" }
+      - "trial_court_division": ${ trial_court.division if hasattr(trial_court, 'division') else "" }
+      - "docket_number": ${ str(docket_number) if defined('docket_number') else "" }
+      - "docket_numbers": ${ str(docket_number) if defined('docket_number') else "" }
+      - "plaintiffs1_name_full": ${ plaintiffs[0].name.full() }
+      - "defendants1_name_full": ${ defendants[0].name.full() }
+      - "petitioners1_name_full": ${ petitioners[0].name.full() }
+      - "users1_name_full1": ${ petitioners[0].name.full() }
+      - "petitioners1_name_full1": ${ petitioners[0].name.full() }
+      - "petitioner_name": ${ "I " + petitioners[0].name.full() + ", a party in the above captioned matter" }
+      - "petitioner_intro": ${ "I " + petitioners[0].name.full() + ", a party in the above captioned matter" }
+      - "I_petitioner_a_party": ${ "I " + petitioners[0].name.full() + ", a party in the above captioned matter" }
+      - "petitioner_statement": ${ "I " + petitioners[0].name.full() + ", a party in the above captioned matter" }
+      - "I_a_party": ${ "I " + petitioners[0].name.full() + ", a party in the above captioned matter" }
+      - "petitioner_party_statement": ${ "I " + petitioners[0].name.full() + ", a party in the above captioned matter" }
+      - "petitioners1_address_on_one_line": ${ users[0].address.on_one_line() if defined('users[0].address.address') else "" }
+      - "petitioners1_phone": ${ users[0].phone_number if defined('users[0].phone_number') else "" }
+      - "petitioners1_email": ${ users[0].email if defined('users[0].email') else "" }
+      - "respondents1_name_full": ${ respondents[0].name.full() }
+      - "order_requested": ${ order_requested }
+      - "domesticated_animals": ${ domesticated_animals }
+      - "respondents1_refrain": ${ respondents1_refrain if defined('respondents1_refrain') else False }
+      - "respondent_refrain_checkbox": ${ respondents1_refrain if defined('respondents1_refrain') else False }
+      - "respondent_refrain_name": ${ respondents[0].name.full() if (respondents1_refrain and respondents and respondents[0] and respondents[0].name) else "" }
+      - "respondent_name_refrain": ${ respondents[0].name.full() if (respondents1_refrain and respondents and respondents[0] and respondents[0].name) else "" }
+      - "respondent_name": ${ respondents[0].name.full() if (respondents1_refrain and respondents and respondents[0] and respondents[0].name) else "" }
+      - "other_parties1_name_full": ${ respondents[0].name.full() if (respondents1_refrain and respondents and respondents[0] and respondents[0].name) else "" }
+      - "respondent_name_in_refrain": ${ respondents[0].name.full() if (respondents1_refrain and respondents and respondents[0] and respondents[0].name) else "" }
+      - "domesticated_animals1": ${ domesticated_animals1 if respondents1_refrain else "" }
+      - "animals_refrain": ${ domesticated_animals1 if respondents1_refrain else "" }
+      - "petitioners1_possess": ${ petitioners1_possess }
+      - "petitioner_possession_name": ${ petitioners[0].name.full() if petitioners1_possess else "" }
+      - "petitioner_name_possession": ${ petitioners[0].name.full() if petitioners1_possess else "" }
+      - "domesticated_animals2": ${ domesticated_animals2 if petitioners1_possess else "" }
+      - "animals_possession": ${ domesticated_animals2 if petitioners1_possess else "" }
+      - "supporting_statement": ${ supporting_statement }
+      - "signature_date": ${ signature_date }
+      - "users1_signature": ${ users[0].signature_if_final(i) }
+      - "petitioner_mail": ${ petitioners1_mail }
+      - "court_will_mail": ${ court_mail }
+      - "hearing_court_name": ${ hearing_court_name if defined('hearing_court_name') else "" }
+      - "hearing_court_address": ${ hearing_court_address if defined('hearing_court_address') else "" }
+      - "hearing_date": ${ hearing_date.format() if defined('hearing_date') else "" }
+      - "hearing_time": ${ hearing_time if defined('hearing_time') else "" }
