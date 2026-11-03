@@ -383,6 +383,7 @@ review:
       ${ word(yesno(court_mail)) }
 ---
 continue button field: docket_numbers.revisit
+id: "edit docket numbers"
 question: |
   Edit docket_numbers
 subquestion: |
@@ -400,6 +401,7 @@ confirm: True
 
 ---
 continue button field: plaintiffs.revisit
+id: "edit plaintiffs"
 question: |
   Edit plaintiffs
 subquestion: |
@@ -418,6 +420,7 @@ confirm: True
 
 ---
 continue button field: defendants.revisit
+id: "edit defendants"
 question: |
   Edit defendants
 subquestion: |
@@ -436,6 +439,7 @@ confirm: True
 
 ---
 continue button field: petitioners.revisit
+id: "edit petitioners"
 question: |
   Edit petitioners
 subquestion: |
@@ -457,6 +461,7 @@ confirm: True
 
 ---
 continue button field: respondents.revisit
+id: "edit respondents"
 question: |
   Edit respondents
 subquestion: |

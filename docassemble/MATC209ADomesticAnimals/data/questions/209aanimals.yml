@@ -390,6 +390,7 @@ review:
       ${ hearing_time }
 ---
 continue button field: plaintiffs.revisit
+id: "edit plaintiffs"
 question: |
   Edit plaintiffs
 subquestion: |
@@ -411,6 +412,7 @@ confirm: True
 
 ---
 continue button field: defendants.revisit
+id: "edit defendants"
 question: |
   Edit defendants
 subquestion: |
