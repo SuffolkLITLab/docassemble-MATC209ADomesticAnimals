@@ -239,7 +239,7 @@ subquestion: |
   
   **Time:** About 10 minutes.
 continue button field: animals_209a_welcome
-button: Get Started
+continue button label: Get Started
 ---
 id: existing_case_check
 question: |

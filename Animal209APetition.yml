@@ -261,7 +261,7 @@ subquestion: |
   
   **Time:** About 10 minutes.
 continue button field: animals_209a_welcome
-button: Get Started
+continue button label: Get Started
 ---
 id: existing_case_check
 question: |
@@ -414,7 +414,6 @@ subquestion: |
     }
   </style>
 field: order_requested
-button style: horizontal
 buttons:
   - "Yes": True
   - "No": False
@@ -453,7 +452,6 @@ subquestion: |
   </ul>
   </div>
 field: respondents1_refrain
-button style: horizontal
 buttons:
   - Yes, I want them to stop: True
   - No, this is not needed: False
@@ -665,7 +663,6 @@ subquestion: |
     }
   </style>
 field: petitioners1_possess
-button style: horizontal
 buttons:
   - Yes: True
   - No: False
