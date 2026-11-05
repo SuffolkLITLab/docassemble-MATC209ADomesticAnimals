@@ -261,7 +261,7 @@ subquestion: |
   
   **Time:** About 10 minutes.
 continue button field: animals_209a_welcome
-button: Get Started
+continue button label: Get Started
 ---
 id: existing_case_check
 question: |
@@ -273,9 +273,12 @@ subquestion: |
   <p style="margin: 5px 0 0 0; color: #333; font-size: 15px;">• Have a case already filed in court, OR<br>
   • Be filing this at the same time as your main case (like a restraining order or divorce)</p>
   </div>
-yesno: existing_case
+fields:
+  - no label: existing_case
+    datatype: yesnoradio
 ---
 event: no_existing_case_exit
+id: "you need a court case first"
 question: |
   You need a court case first
 subquestion: |
@@ -312,6 +315,7 @@ code: |
   existing_case_check = True
 ---
 event: no_relief_requested_exit
+id: "you need to ask the court for help"
 question: |
   You need to ask the court for help
 subquestion: |
@@ -410,7 +414,6 @@ subquestion: |
     }
   </style>
 field: order_requested
-button style: horizontal
 buttons:
   - "Yes": True
   - "No": False
@@ -449,7 +452,6 @@ subquestion: |
   </ul>
   </div>
 field: respondents1_refrain
-button style: horizontal
 buttons:
   - Yes, I want them to stop: True
   - No, this is not needed: False
@@ -661,7 +663,6 @@ subquestion: |
     }
   </style>
 field: petitioners1_possess
-button style: horizontal
 buttons:
   - Yes: True
   - No: False
@@ -876,6 +877,7 @@ review:
       ${ word(yesno(mail_not_sure)) }
 ---
 continue button field: docket_number
+id: "edit docket number"
 question: |
   Edit docket number
 subquestion: |
@@ -885,6 +887,7 @@ subquestion: |
 
 ---
 continue button field: plaintiffs.revisit
+id: "edit plaintiffs"
 question: |
   Edit plaintiffs
 subquestion: |
@@ -905,6 +908,7 @@ confirm: True
 
 ---
 continue button field: defendants.revisit
+id: "edit defendants"
 question: |
   Edit defendants
 subquestion: |
@@ -925,6 +929,7 @@ confirm: True
 
 ---
 continue button field: petitioners.revisit
+id: "edit petitioners"
 question: |
   Edit petitioners
 subquestion: |
@@ -948,6 +953,7 @@ confirm: True
 
 ---
 continue button field: respondents.revisit
+id: "edit respondents"
 question: |
   Edit respondents
 subquestion: |
